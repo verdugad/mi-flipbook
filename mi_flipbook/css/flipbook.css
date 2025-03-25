@@ -1,0 +1,635 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    overflow-x: hidden;
+}
+
+.flipbook-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 90vh;
+    padding: 20px;
+    position: relative;
+}
+
+
+/* Mensaje de carga */
+
+.loading-message {
+    font-size: 18px;
+    color: #333;
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    min-width: 300px;
+}
+
+
+/* Contenedor principal del flipbook */
+
+#flipbook {
+    margin: 0 auto;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    background-color: #fff;
+    max-width: 100%;
+    max-height: calc(100vh - 220px);
+    border: none !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+
+#flipbook.hidden {
+    display: none;
+}
+
+
+/* Estilos para el modo zoom */
+
+#flipbook.zoom-mode {
+    overflow: visible !important;
+}
+
+#flipbook.zoom-mode .page-container {
+    cursor: move;
+    /* Indicador de que se puede arrastrar */
+}
+
+
+/* Estilo para las páginas */
+
+#flipbook .page {
+    background-color: white;
+    overflow: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+}
+
+#flipbook .turn-page {
+    background-color: white;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+}
+
+
+/* Contenedor de cada página */
+
+.page-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    overflow: hidden !important;
+}
+
+
+/* Estilos para los canvas */
+
+#flipbook .page canvas,
+#flipbook .page-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    object-fit: cover;
+    image-rendering: high-quality;
+    image-rendering: -webkit-optimize-contrast;
+    /* Para Safari */
+    -ms-interpolation-mode: bicubic;
+    /* Para IE */
+    transform: translateZ(0);
+    /* Forzar aceleración de hardware */
+    will-change: transform;
+    /* Optimización para navegadores modernos */
+    filter: none !important;
+    /* Evitar filtros que puedan reducir la calidad */
+}
+
+
+/* Estilos para la unión de páginas */
+
+#flipbook .hard {
+    background-color: #f0f0f0 !important;
+    color: #333;
+    text-align: center;
+}
+
+#flipbook .odd {
+    box-shadow: inset -10px 0 20px -10px rgba(0, 0, 0, 0.4) !important;
+}
+
+#flipbook .even {
+    box-shadow: inset 10px 0 20px -10px rgba(0, 0, 0, 0.4) !important;
+}
+
+
+/* Controles de navegación */
+
+.controls {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.control-button {
+    padding: 10px 15px;
+    background-color: #2980b9;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s;
+}
+
+.control-button:hover {
+    background-color: #3498db;
+}
+
+
+/* Estilo para el botón de zoom */
+
+#zoom-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+#zoom-btn.active {
+    background-color: #e74c3c;
+}
+
+#page-num {
+    font-size: 14px;
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+
+/* Instrucciones para compartir */
+
+.share-instructions {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.share-instructions h3 {
+    color: #2980b9;
+    margin-top: 0;
+}
+
+
+/* Prompt de instalación */
+
+.install-prompt {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-align: center;
+    max-width: 90%;
+    width: 320px;
+}
+
+.install-prompt p {
+    margin: 0 0 10px 0;
+    font-weight: bold;
+}
+
+.install-prompt button {
+    margin: 5px;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#installBtn {
+    background-color: #2980b9;
+    color: white;
+}
+
+#closePromptBtn {
+    background-color: #f1f1f1;
+    color: #333;
+}
+
+
+/* Estilos para móviles */
+
+@media (max-width: 768px) {
+    .flipbook-container {
+        padding: 10px;
+    }
+    .controls {
+        gap: 8px;
+    }
+    .control-button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    #flipbook {
+        max-height: calc(100vh - 180px);
+    }
+}
+
+
+/* Asegurar proporción A4 en cada página */
+
+#flipbook .page-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-container canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* Estilo específico para mantener proporción A4 */
+
+.maintain-a4-ratio {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.maintain-a4-ratio:before {
+    content: "";
+    display: block;
+    padding-top: 141.42%;
+    /* Proporción A4 (1/0.7071)*100 */
+}
+
+.maintain-a4-ratio>* {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+
+/* Ajustes para modo doble página */
+
+@media (min-width: 768px) {
+    #flipbook {
+        display: flex !important;
+    }
+    #flipbook .page {
+        flex: 1;
+        max-width: 50%;
+    }
+}
+
+
+/* NUEVOS ESTILOS PARA LA LUPA */
+
+
+/* Estilos para el contenedor de la lupa */
+
+#magnifier-container {
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    border: 3px solid #4CAF50;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    background-color: white;
+    pointer-events: none;
+    transition: box-shadow 0.3s ease;
+}
+
+#magnifier-container:hover {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+}
+
+
+/* Indicador de lupa fija */
+
+.fixed-indicator {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 10000;
+}
+
+
+/* Estilos para las instrucciones de la lupa */
+
+#magnifier-instructions {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.instructions-content {
+    background-color: white;
+    padding: 20px 30px;
+    border-radius: 10px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.instructions-content h3 {
+    margin-top: 0;
+    color: #4CAF50;
+}
+
+.instructions-content p {
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+#close-instructions {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+#close-instructions:hover {
+    background-color: #388e3c;
+}
+
+
+/* Cursor personalizado para el modo lupa */
+
+.magnifier-mode #flipbook {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%234CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>'), auto;
+}
+
+
+/* Animación de fade in */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+
+/* Mejoras para la lupa en dispositivos móviles */
+
+@media (max-width: 768px) {
+    #magnifier-container {
+        width: 200px;
+        height: 200px;
+    }
+    .instructions-content {
+        max-width: 300px;
+        padding: 15px;
+    }
+}
+
+
+/* Estilos para la animación de carga */
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    margin: 20px auto;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    text-align: center;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: #2980b9;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-animation {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.loading-dot {
+    width: 8px;
+    height: 8px;
+    margin: 0 5px;
+    background-color: #2980b9;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.loading-dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+.loading-dot:nth-child(3) {
+    animation-delay: 0s;
+}
+
+.loading-dot:nth-child(4) {
+    animation-delay: 0.16s;
+}
+
+.loading-dot:nth-child(5) {
+    animation-delay: 0.32s;
+}
+
+@keyframes bounce {
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+.reload-btn {
+    margin-top: 15px;
+    padding: 8px 15px;
+    background-color: #2980b9;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.reload-btn:hover {
+    background-color: #3498db;
+}
+
+
+/* Estilos para mejorar la legibilidad de textos pequeños */
+
+.page-container {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+
+/* Asegurar que no hay transformaciones que puedan afectar la nitidez */
+
+.page {
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+}
+
+
+/* Mejorar contraste general */
+
+body {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* Añadir estos estilos al CSS para asegurar un tamaño mínimo */
+
+#flipbook {
+    min-height: 500px;
+    /* Altura mínima para asegurar legibilidad */
+}
+
+.page-container {
+    min-height: 500px;
+    /* Altura mínima para cada página */
+}
+
+
+/* En pantallas más grandes, aumentar aún más el tamaño mínimo */
+
+@media (min-width: 1200px) {
+    #flipbook {
+        min-height: 600px;
+    }
+    .page-container {
+        min-height: 600px;
+    }
+}
+
+
+/* En pantallas muy grandes, aumentar aún más */
+
+@media (min-width: 1600px) {
+    #flipbook {
+        min-height: 700px;
+    }
+    .page-container {
+        min-height: 700px;
+    }
+}

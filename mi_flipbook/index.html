@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Revista Digital</title>
+    <link rel="stylesheet" href="css/flipbook.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2980b9">
+    <link rel="apple-touch-icon" href="images/icon-192.png">
+</head>
+
+<body>
+    <div class="flipbook-container">
+        <div class="loading-message">Cargando revista, por favor espere...</div>
+
+        <div id="flipbook" class="hidden">
+            <!-- Las páginas se cargarán aquí desde el PDF -->
+        </div>
+
+        <div class="controls">
+            <button id="prev" class="control-button">Anterior</button>
+            <span id="page-num">0 de 0</span>
+            <button id="next" class="control-button">Siguiente</button>
+            <button id="fullscreen" class="control-button">Pantalla completa</button>
+            <a id="download" href="pdf/revista.pdf" download class="control-button">Descargar PDF</a>
+        </div>
+    </div>
+
+    <div class="share-instructions">
+        <h3>Revista Digital Interactiva</h3>
+        <p>Navega usando los botones o deslizando las páginas.</p>
+        <p>Puedes instalar esta revista en tu dispositivo para verla sin conexión.</p>
+    </div>
+
+    <div class="install-prompt" id="installPrompt">
+        <p>¡Instala esta revista en tu dispositivo!</p>
+        <button id="installBtn">Instalar</button>
+        <button id="closePromptBtn">No, gracias</button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/pdf.min.js"></script>
+    <script src="js/turn.min.js"></script>
+    <script src="js/flipbook.js"></script>
+
+    <script>
+        // Registrar el Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker registrado'))
+                .catch(err => console.log('Error al registrar Service Worker', err));
+        }
+
+        // Lógica para la instalación de PWA
+        let deferredPrompt;
+        const installPrompt = document.getElementById('installPrompt');
+        const installBtn = document.getElementById('installBtn');
+        const closePromptBtn = document.getElementById('closePromptBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installPrompt.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', () => {
+            installPrompt.style.display = 'none';
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Usuario aceptó la instalación');
+                }
+                deferredPrompt = null;
+            });
+        });
+
+        closePromptBtn.addEventListener('click', () => {
+            installPrompt.style.display = 'none';
+        });
+    </script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+
+</body>
+
+</html>
